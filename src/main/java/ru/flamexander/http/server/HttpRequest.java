@@ -58,7 +58,7 @@ public class HttpRequest {
         this.parseHeadersLine();
 
         logger.debug("\n{}", rawRequest);
-        logger.trace("{} {}\nParameters: {}\nBody: {}", method, uri, parameters, body); // TODO правильно все поназывать
+        logger.trace("\nMethod: {}\nURI: {}\nParameters: {}\nBody: {}", method, uri, parameters, body);
     }
 
     private void tryToParseBody() {
