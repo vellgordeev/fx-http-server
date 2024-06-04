@@ -39,22 +39,22 @@ public class HttpResponse {
     }
 
     public String getFullResponse() {
-        StringBuilder sb = new StringBuilder();
+        if (fullResponse == null) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(firstLine).append("\r\n");
+            for (Map.Entry<String, String> entry : headers.entrySet()) {
+                sb.append(entry.getKey()).append(": ").append(entry.getValue()).append("\r\n");
+            }
 
-        sb.append(firstLine).append("\r\n");
+            // Empty string between headers and body
+            sb.append("\r\n");
+            if (body != null) {
+                sb.append(body);
+            }
+            sb.append("\r\n\r\n");
+            this.fullResponse = sb.toString();
 
-        for (Map.Entry<String, String> entry : headers.entrySet()) {
-            sb.append(entry.getKey()).append(": ").append(entry.getValue()).append("\r\n");
         }
-
-        // Empty string between headers and body
-        sb.append("\r\n");
-
-        if (body != null) {
-            sb.append(body);
-        }
-        sb.append("\r\n\r\n");
-
-        return sb.toString();
+        return fullResponse;
     }
 }
