@@ -1,7 +1,9 @@
-package ru.flamexander.http.server;
+package ru.flamexander.http.server.helpers;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+@AllArgsConstructor
 @Getter
 public enum ContentType {
     APPLICATION_JSON("application/json"),
@@ -12,10 +14,6 @@ public enum ContentType {
     APPLICATION_JAVASCRIPT("application/javascript");
 
     private final String value;
-
-    ContentType(String value) {
-        this.value = value;
-    }
 
     @Override
     public String toString() {

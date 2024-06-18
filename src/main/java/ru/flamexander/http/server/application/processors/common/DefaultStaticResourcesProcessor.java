@@ -1,16 +1,18 @@
-package ru.flamexander.http.server.processors;
+package ru.flamexander.http.server.application.processors.common;
 
-import ru.flamexander.http.server.HttpRequest;
-import ru.flamexander.http.server.HttpResponse;
+import ru.flamexander.http.server.application.processors.AbstractRequestProcessor;
+import ru.flamexander.http.server.server.HttpRequest;
+import ru.flamexander.http.server.server.HttpResponse;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class DefaultStaticResourcesProcessor implements RequestProcessor {
+public class DefaultStaticResourcesProcessor extends AbstractRequestProcessor {
+
     @Override
-    public void execute(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
+    public HttpResponse processRequest(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
         String filename = httpRequest.getUri().substring(1);
         Path filePath = Paths.get("static/", filename);
         String fileType = filename.substring(filename.lastIndexOf(".") + 1);
@@ -20,8 +22,9 @@ public class DefaultStaticResourcesProcessor implements RequestProcessor {
             httpResponse.setHeader("Content-Disposition", "attachment;filename=" + filename);
         }
 
-        httpResponse.setFirstLine("HTTP/1.1 200 OK");
+        httpResponse.setRequestLine("HTTP/1.1 200 OK");
         httpResponse.setHeader("Content-Length", String.valueOf(fileData.length));
-        httpResponse.send();
+
+        return httpResponse;
     }
 }

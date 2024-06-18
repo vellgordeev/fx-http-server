@@ -1,31 +1,29 @@
 package ru.flamexander.http.server.application.processors;
 
-import ru.flamexander.http.server.HttpRequest;
-import ru.flamexander.http.server.HttpResponse;
 import ru.flamexander.http.server.application.validators.AcceptHeaderValidator;
-import ru.flamexander.http.server.application.validators.HeaderValidator;
-import ru.flamexander.http.server.processors.RequestProcessor;
+import ru.flamexander.http.server.application.validators.RequestValidatorChain;
+import ru.flamexander.http.server.server.HttpRequest;
+import ru.flamexander.http.server.server.HttpResponse;
 
 import java.io.IOException;
+import java.util.Arrays;
 
-import static ru.flamexander.http.server.ContentType.TEXT_HTML;
+import static ru.flamexander.http.server.helpers.ContentType.TEXT_HTML;
 
-public class HelloWorldRequestProcessor implements RequestProcessor {
-    private final HeaderValidator acceptHeaderValidator;
+public class HelloWorldRequestProcessor extends ValidatingRequestProcessor {
 
     public HelloWorldRequestProcessor() {
-        this.acceptHeaderValidator = new AcceptHeaderValidator(TEXT_HTML);
+        super(new RequestValidatorChain(Arrays.asList(
+                new AcceptHeaderValidator(TEXT_HTML)
+        )));
     }
 
     @Override
-    public void execute(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
-        if (!acceptHeaderValidator.isValid(httpRequest, httpResponse)) {
-            return;
-        }
-
-        httpResponse.setFirstLine("HTTP/1.1 200 OK");
+    public HttpResponse processRequest(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
+        httpResponse.setRequestLine("HTTP/1.1 200 OK");
         httpResponse.setHeader("Content-Type", "text/html");
         httpResponse.setBody("<html><body><h1>Hello World!!!</h1></body></html>");
-        httpResponse.send();
+
+        return httpResponse;
     }
 }

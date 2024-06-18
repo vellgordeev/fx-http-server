@@ -1,4 +1,4 @@
-package ru.flamexander.http.server;
+package ru.flamexander.http.server.helpers;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
