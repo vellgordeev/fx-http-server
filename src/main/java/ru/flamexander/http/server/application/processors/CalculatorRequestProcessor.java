@@ -1,21 +1,43 @@
 package ru.flamexander.http.server.application.processors;
 
-import ru.flamexander.http.server.HttpRequest;
-import ru.flamexander.http.server.processors.RequestProcessor;
+import ru.flamexander.http.server.application.processors.common.DefaultUnknownOperationProcessor;
+import ru.flamexander.http.server.application.validators.AcceptHeaderValidator;
+import ru.flamexander.http.server.application.validators.RequestValidatorChain;
+import ru.flamexander.http.server.server.HttpRequest;
+import ru.flamexander.http.server.server.HttpResponse;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Objects;
 
-public class CalculatorRequestProcessor implements RequestProcessor {
+import static ru.flamexander.http.server.helpers.ContentType.TEXT_HTML;
+
+public class CalculatorRequestProcessor extends ValidatingRequestProcessor {
+
+    public CalculatorRequestProcessor() {
+        super(new RequestValidatorChain(Arrays.asList(
+                new AcceptHeaderValidator(TEXT_HTML)
+        )));
+    }
+
     @Override
-    public void execute(HttpRequest httpRequest, OutputStream output) throws IOException {
-        int a = Integer.parseInt(httpRequest.getParameter("a"));
-        int b = Integer.parseInt(httpRequest.getParameter("b"));
+    public HttpResponse processRequest(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
+        Map<String, String> parameters = Objects.requireNonNull(httpRequest.getParameters());
+        if (!(parameters.size() == 2)) {
+            new DefaultUnknownOperationProcessor().processRequest(httpRequest, httpResponse);
+        }
+        int a = Integer.parseInt(parameters.get("a"));
+        int b = Integer.parseInt(parameters.get("b"));
         int result = a + b;
         String outMessage = a + " + " + b + " = " + result;
 
-        String response = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<html><body><h1>" + outMessage + "</h1></body></html>";
-        output.write(response.getBytes(StandardCharsets.UTF_8));
+        httpResponse.setRequestLine("HTTP/1.1 200 OK");
+        httpResponse.setHeader("Content-Type", TEXT_HTML.getValue());
+        httpResponse.setHeader("Connection", "keep-alive");
+        httpResponse.setHeader("Access-Control-Allow-Origin", "*");
+        httpResponse.setBody("<html><body><h1>" + outMessage + "</h1></body></html>");
+
+        return httpResponse;
     }
 }
